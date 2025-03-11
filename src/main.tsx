@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 
 import { PostService } from '@services';
@@ -13,28 +14,26 @@ postService.start();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={<Layout component={<HomePage />} />}
-          />
-          <Route
-            path="/blog"
-            element={<Layout variant="grow" component={<PostListPage  />} />}
-          />
-          <Route
-            path="/blog/:slug"
-            element={<Layout component={<PostPage />} />}
-          />
-          <Route
-            path="/about"
-            element={<Layout component={<AboutPage />} />}
-          />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout component={<HomePage />} />} />
+            <Route
+              path="/blog"
+              element={<Layout variant="grow" component={<PostListPage />} />}
+            />
+            <Route
+              path="/blog/:slug"
+              element={<Layout component={<PostPage />} />}
+            />
+            <Route
+              path="/about"
+              element={<Layout component={<AboutPage />} />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </HelmetProvider>
   </StrictMode>,
 );
-
