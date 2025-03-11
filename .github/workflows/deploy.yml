@@ -28,9 +28,6 @@ jobs:
           # Jeśli submoduł (repo Obsidian) jest prywatny, odkomentuj poniższą linię:
           token: ${{ secrets.BLOG_PAT_TOKEN }}
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
 
