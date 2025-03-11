@@ -7,6 +7,16 @@ on:
   repository_dispatch:
     types: [obsidian-update]
 
+permissions:
+  contents: read # Odczyt plików repozytorium
+  pages: write # Uprawnienia do publikacji na GitHub Pages
+  id-token: write # Weryfikacja źródła deploymentu
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,31 +28,36 @@ jobs:
           # Jeśli submoduł (repo Obsidian) jest prywatny, odkomentuj poniższą linię:
           token: ${{ secrets.BLOG_PAT_TOKEN }}
 
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
 
       - name: Install Dependencies
-        run: bun install
+        run: bun ci
 
       - name: Build Blog with Vite
         run: bun run build
 
-      - name: Upload artifact for Pages deployment
-        id: deployment
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          # Upload dist folder
+          path: './dist'
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write # Uprawnienia do publikacji na GitHub Pages
-      id-token: write # Weryfikacja źródła deploymentu
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
