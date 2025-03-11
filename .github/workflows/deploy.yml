@@ -35,7 +35,7 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install Dependencies
-        run: bun ci
+        run: bun install
 
       - name: Build Blog with Vite
         run: bun run build
