@@ -1,0 +1,48 @@
+name: Build and Deploy Blog
+
+on:
+  push:
+    branches:
+      - main
+  repository_dispatch:
+    types: [obsidian-update]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository with Submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          # Jeśli submoduł (repo Obsidian) jest prywatny, odkomentuj poniższą linię:
+          token: ${{ secrets.BLOG_PAT_TOKEN }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Blog with Vite
+        run: bun run build
+
+      - name: Upload artifact for Pages deployment
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write # Uprawnienia do publikacji na GitHub Pages
+      id-token: write # Weryfikacja źródła deploymentu
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

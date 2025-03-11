@@ -1,0 +1,9 @@
+import type { T{{pascalCase componentsName}} } from "./{{pascalCase componentsName}}.types";
+{{#if shouldCreateStyle}}
+
+import "./{{pascalCase componentsName}}.styles.css";
+{{/if}}
+
+export const {{pascalCase componentsName}}: T{{pascalCase componentsName}} = () => {
+  return <div{{#if shouldCreateStyle}} className="{{kebabCase componentsName}}"{{/if}}></div>;
+};
