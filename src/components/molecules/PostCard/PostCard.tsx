@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ArrowRight, Calendar } from 'lucide-react';
-import type { TBlogCard } from './BlogCard.types';
+import type { TPostCard } from './PostCard.types';
 
-export const BlogCard: TBlogCard = ({ post }) => {
+export const PostCard: TPostCard = ({ post }) => {
   return (
     <article className="bg-card rounded-xl shadow-md dark:shadow-accent overflow-hidden hover:shadow-lg transition-all group">
       <div className="p-6">

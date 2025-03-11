@@ -4,21 +4,21 @@ import { ArrowLeft, Calendar } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 
-import { BlogService } from '@services';
+import { PostService } from '@services';
 
-import type { Post } from '@types';
+import type { IPost } from '@types';
 
-const blogService = BlogService.getInstance();
+const postService = PostService.getInstance();
 
-export const BlogPost: React.FC = () => {
+export const PostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<Post | undefined>();
+  const [post, setPost] = useState<IPost | undefined>();
 
   useEffect(() => {
     const loadPost = async () => {
-      await blogService.start();
+      await postService.start();
       if (slug) {
-        setPost(blogService.getPostBySlug(slug));
+        setPost(postService.getPostBySlug(slug));
       }
     };
     loadPost();

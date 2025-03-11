@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
-import { BlogService } from '@services';
+import { PostService } from '@services';
 
-import { BlogCard } from '@molecules';
+import { PostCard } from '@molecules';
 
-import type { Post } from '@types';
+import type { IPost } from '@types';
 
-export const BlogList: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+export const PostListPage: React.FC = () => {
+  const [posts, setPosts] = useState<IPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const blogService = BlogService.getInstance();
+  const postService = PostService.getInstance();
 
   useEffect(() => {
     const loadPosts = async () => {
       setIsLoading(true);
-      await blogService.start();
-      setPosts(blogService.getPosts(1));
+      await postService.start();
+      setPosts(postService.getPosts(1));
       setIsLoading(false);
     };
     loadPosts();
@@ -37,7 +37,7 @@ export const BlogList: React.FC = () => {
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <BlogCard key={post.slug} post={post} />
+            <PostCard key={post.slug} post={post} />
           ))}
         </div>
       )}

@@ -1,20 +1,20 @@
-import type { Post } from '@types';
+import type { IPost } from '@types';
 
 type FrontMatterData = Record<string, string | string[] | number | boolean>;
 
-export class BlogService {
-  private static instance: BlogService;
-  private posts: Map<string, Post> = new Map();
+export class PostService {
+  private static instance: PostService;
+  private posts: Map<string, IPost> = new Map();
   private postsLoaded = false;
   private postsPerPage = 10;
 
   private constructor() {}
 
-  public static getInstance(): BlogService {
-    if (!BlogService.instance) {
-      BlogService.instance = new BlogService();
+  public static getInstance(): PostService {
+    if (!PostService.instance) {
+      PostService.instance = new PostService();
     }
-    return BlogService.instance;
+    return PostService.instance;
   }
 
   // Parse frontmatter from markdown content
@@ -59,7 +59,7 @@ export class BlogService {
   }
 
   // Parse markdown content into a structured Post object
-  private parseMarkdownToPost(filename: string, markdown: string): Post {
+  private parseMarkdownToPost(filename: string, markdown: string): IPost {
     try {
       // Extract frontmatter and content
       const { frontMatter, content } = this.parseFrontMatter(markdown);
@@ -110,7 +110,7 @@ export class BlogService {
     try {
       // Updated to use new import.meta.glob syntax
       const imports = import.meta.glob(
-        '/buashei_nexus/01 - Blog Posts/**/*.md',
+        '/buashei_nexus/01 - Blog Posts/01 - Published/*.md',
         {
           query: '?raw',
           import: 'default',
@@ -146,7 +146,7 @@ export class BlogService {
   private async loadPostsFallback(): Promise<void> {
     try {
       // Create some sample posts for development/testing
-      const dummyPost: Post = {
+      const dummyPost: IPost = {
         id: 'sample-post',
         slug: 'sample-post',
         title: 'Sample Post',
@@ -169,7 +169,7 @@ export class BlogService {
    * @param page - The page number (starting from 1)
    * @returns Array of posts for the requested page
    */
-  public getPosts(page = 1): Post[] {
+  public getPosts(page = 1): IPost[] {
     // Ensure posts are loaded
     if (!this.postsLoaded) {
       this.start();
@@ -196,7 +196,7 @@ export class BlogService {
    * @param slug - The post slug to find
    * @returns The post if found, undefined otherwise
    */
-  public getPostBySlug(slug: string): Post | undefined {
+  public getPostBySlug(slug: string): IPost | undefined {
     // Ensure posts are loaded
     if (!this.postsLoaded) {
       this.start();

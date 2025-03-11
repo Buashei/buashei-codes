@@ -3,14 +3,13 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 
-import { BlogService } from '@services';
-import { BlogList, BlogPost, HomePage, AboutPage } from '@pages';
+import { PostService } from '@services';
+import { PostListPage, PostPage, HomePage, AboutPage } from '@pages';
 import { ThemeProvider } from '@context';
 import { Layout } from '@templates';
 
-// Inicjalizacja serwisu blogowego
-const blogService = BlogService.getInstance();
-blogService.start();
+const postService = PostService.getInstance();
+postService.start();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -19,38 +18,23 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route
             path="/"
-            element={
-              <Layout>
-                <HomePage />
-              </Layout>
-            }
+            element={<Layout component={<HomePage />} />}
           />
           <Route
             path="/blog"
-            element={
-              <Layout>
-                <BlogList />
-              </Layout>
-            }
+            element={<Layout variant="grow" component={<PostListPage  />} />}
           />
           <Route
             path="/blog/:slug"
-            element={
-              <Layout>
-                <BlogPost />
-              </Layout>
-            }
+            element={<Layout component={<PostPage />} />}
           />
           <Route
             path="/about"
-            element={
-              <Layout>
-                <AboutPage />
-              </Layout>
-            }
+            element={<Layout component={<AboutPage />} />}
           />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,
 );
+
