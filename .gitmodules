@@ -1,0 +1,4 @@
+[submodule "buashei_nexus"]
+	path = buashei_nexus
+	url = https://github.com/Buashei/buashei_nexus.git
+    ignore = all
