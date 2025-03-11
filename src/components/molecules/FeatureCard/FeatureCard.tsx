@@ -1,4 +1,3 @@
-import React from 'react';
 import type { TFeatureCard } from './FeatureCard.types';
 
 export const FeatureCard: TFeatureCard = ({

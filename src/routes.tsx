@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode, JSX } from 'react';
 import { Layout } from '@templates';
 
 import { HomePage, BlogList, BlogPost, AboutPage } from '@pages';

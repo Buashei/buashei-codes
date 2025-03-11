@@ -1,6 +1,3 @@
-import React from 'react';
-import type { LucideIcon } from 'lucide-react';
-
 import type { TThemeButton } from './ThemeButton.types';
 
 export const ThemeButton: TThemeButton = ({

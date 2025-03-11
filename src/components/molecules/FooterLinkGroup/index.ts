@@ -1,1 +1,1 @@
-export { FooterLinkGroup } from "./FooterLinkGroup";
+export { FooterLinkGroup } from './FooterLinkGroup';
