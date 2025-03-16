@@ -8,13 +8,12 @@ on:
     types: [obsidian-update]
 
 permissions:
-  contents: read # Odczyt plików repozytorium
-  pages: write # Uprawnienia do publikacji na GitHub Pages
-  id-token: write # Weryfikacja źródła deploymentu
+  contents: read  # Read repository files
+  pages: write    # Permission to publish to GitHub Pages
+  id-token: write # Verification of deployment source
 
-# Allow one concurrent deployment
 concurrency:
-  group: 'pages'
+  group: 'blog-deployment'
   cancel-in-progress: true
 
 jobs:
@@ -24,9 +23,11 @@ jobs:
       - name: Checkout Repository with Submodules
         uses: actions/checkout@v3
         with:
-          submodules: 'recursive'
-          # Jeśli submoduł (repo Obsidian) jest prywatny, odkomentuj poniższą linię:
+          submodules: true
           token: ${{ secrets.BLOG_PAT_TOKEN }}
+
+      - name: Update submodules to latest commit
+        run: git submodule update --remote
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -40,17 +41,14 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload dist folder
           path: './dist'
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Setup Pages
         uses: actions/configure-pages@v4
