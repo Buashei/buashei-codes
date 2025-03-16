@@ -61,32 +61,59 @@ jobs:
         with:
           path: ./src/posts
           key: blog-posts-${{ github.sha }}
-
+  
   build:
     needs: fetch_content
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+        
       - name: Restore blog content
         uses: actions/cache@v4
         with:
           path: ./src/posts
           key: blog-posts-${{ github.sha }}
-
+        
+      # Dodaj krok do debugowania zawartości katalogu posts
+      - name: Debug - List restored posts
+        run: |
+          echo "Listing posts in ./src/posts after cache restore:"
+          ls -la ./src/posts/
+        
+      # Dodaj ten krok, żeby nadpisać pliki z repozytorium tymi z cache
+      - name: Ensure only cached posts are used
+        run: |
+          # Tworzymy tymczasowy katalog
+          mkdir -p ./temp_posts
+                  
+          # Przenosimy wszystkie pliki z cache do tymczasowego katalogu
+          mv ./src/posts/* ./temp_posts/ 2>/dev/null || true
+                  
+          # Czyścimy katalog docelowy
+          rm -rf ./src/posts/*
+                  
+          # Kopiujemy pliki z powrotem
+          cp -r ./temp_posts/* ./src/posts/ 2>/dev/null || true
+                  
+          # Usuwamy tymczasowy katalog
+          rm -rf ./temp_posts
+                  
+          echo "Final posts list:"
+          ls -la ./src/posts/
+        
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
-
+        
       - name: Install Dependencies
         run: bun install
-
+        
       - name: Build Blog with Vite
         run: bun run build
         env:
           VITE_BLOG_AUTHOR: ${{ vars.VITE_BLOG_AUTHOR }}
           VITE_BLOG_TITLE: ${{ vars.VITE_BLOG_TITLE }}
-
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
