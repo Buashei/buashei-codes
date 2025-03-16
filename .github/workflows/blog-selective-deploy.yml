@@ -45,8 +45,13 @@ jobs:
 
       - name: Copy only published posts to blog content directory
         run: |
+          # Clear existing files in the target directory
+          rm -rf ./src/posts/*
+          
+          # Copy new files from the source repository
           cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.md ./src/posts/ 2>/dev/null || true
           cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.mdx ./src/posts/ 2>/dev/null || true
+          
           echo "Listing copied posts:"
           ls -la ./src/posts/
           rm -rf temp_vault
