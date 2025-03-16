@@ -1,0 +1,93 @@
+name: Build and Deploy Blog (Selective Content)
+
+on:
+  push:
+    branches:
+      - master
+  repository_dispatch:
+    types: [selective-update]
+
+permissions:
+  contents: read  # Read repository files
+  pages: write    # Permission to publish to GitHub Pages
+  id-token: write # Verification of deployment source
+
+concurrency:
+  group: 'blog-selective-deploy'
+  cancel-in-progress: true
+
+jobs:
+  fetch_content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Main Repository
+        uses: actions/checkout@v4
+
+      - name: Create blog posts directory
+        run: mkdir -p ./src/posts
+
+      - name: Fetch Only Published Blog Posts
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.BLOG_REPO }}
+          token: ${{ secrets.BLOG_PAT_TOKEN }}
+          path: temp_vault
+          sparse-checkout: |
+            ${{ vars.BLOG_POSTS_PATH }}
+          sparse-checkout-cone-mode: false
+
+      - name: Copy only published posts to blog content directory
+        run: |
+          cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.md ./src/posts/ 2>/dev/null || true
+          cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.mdx ./src/posts/ 2>/dev/null || true
+          rm -rf temp_vault
+
+      - name: Cache blog content
+        uses: actions/cache@v4
+        with:
+          path: ./src/posts
+          key: blog-posts-${{ github.sha }}
+
+  build:
+    needs: fetch_content
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Restore blog content
+        uses: actions/cache@v4
+        with:
+          path: ./src/posts
+          key: blog-posts-${{ github.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Blog with Vite
+        run: bun run build
+        env:
+          VITE_BLOG_AUTHOR: ${{ vars.VITE_BLOG_AUTHOR }}
+          VITE_BLOG_TITLE: ${{ vars.VITE_BLOG_TITLE }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

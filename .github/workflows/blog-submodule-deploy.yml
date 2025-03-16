@@ -1,11 +1,11 @@
-name: Build and Deploy Blog
+name: Build and Deploy Blog (Submodule)
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - master
   repository_dispatch:
-    types: [obsidian-update]
+    types: [submodule-update]
 
 permissions:
   contents: read  # Read repository files
@@ -13,7 +13,7 @@ permissions:
   id-token: write # Verification of deployment source
 
 concurrency:
-  group: 'blog-deployment'
+  group: 'blog-submodule-deploy'
   cancel-in-progress: true
 
 jobs:
