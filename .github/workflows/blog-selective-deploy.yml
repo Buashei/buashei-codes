@@ -36,10 +36,19 @@ jobs:
             ${{ vars.BLOG_POSTS_PATH }}
           sparse-checkout-cone-mode: false
 
+      - name: Debug - List directory structure
+        run: |
+          echo "Listing temp_vault contents:"
+          ls -la temp_vault/
+          echo "Listing blog posts path:"
+          ls -la temp_vault/'${{ vars.BLOG_POSTS_PATH }}' || echo "Directory not found"
+
       - name: Copy only published posts to blog content directory
         run: |
           cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.md ./src/posts/ 2>/dev/null || true
           cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.mdx ./src/posts/ 2>/dev/null || true
+          echo "Listing copied posts:"
+          ls -la ./src/posts/
           rm -rf temp_vault
 
       - name: Cache blog content
