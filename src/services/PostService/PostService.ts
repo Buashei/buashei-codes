@@ -110,7 +110,8 @@ export class PostService {
     try {
       // Updated to use new import.meta.glob syntax
       const imports = import.meta.glob(
-        '/buashei_nexus/01 - Blog Posts/01 - Published/*.md',
+        '/src/posts/*.md',
+        // '/buashei_nexus/01 - Blog Posts/01 - Published/*.md',
         {
           query: '?raw',
           import: 'default',
