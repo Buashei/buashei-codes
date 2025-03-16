@@ -45,22 +45,25 @@ jobs:
 
       - name: Copy only published posts to blog content directory
         run: |
-          # Clear existing files in the target directory
-          rm -rf ./src/posts/*
+          # Clear existing directory and recreate it
+          rm -rf ./blog-posts-temp
+          mkdir -p ./blog-posts-temp
           
-          # Copy new files from the source repository
-          cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.md ./src/posts/ 2>/dev/null || true
-          cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.mdx ./src/posts/ 2>/dev/null || true
+          # Copy new files from the source repository to temp directory
+          cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.md ./blog-posts-temp/ 2>/dev/null || true
+          cp -r temp_vault/'${{ vars.BLOG_POSTS_PATH }}'/*.mdx ./blog-posts-temp/ 2>/dev/null || true
           
           echo "Listing copied posts:"
-          ls -la ./src/posts/
+          ls -la ./blog-posts-temp/
           rm -rf temp_vault
 
-      - name: Cache blog content
-        uses: actions/cache@v4
+      # Use artifact instead of cache
+      - name: Upload blog content as artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: ./src/posts
-          key: blog-posts-${{ github.sha }}
+          name: blog-posts
+          path: ./blog-posts-temp
+          retention-days: 1
   
   build:
     needs: fetch_content
@@ -69,36 +72,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: Restore blog content
-        uses: actions/cache@v4
+      # Download the artifact and ensure that the src/posts directory is clean
+      - name: Download blog posts artifact
+        run: |
+          # Remove existing posts directory
+          rm -rf ./src/posts
+          mkdir -p ./src/posts
+        
+      - name: Download blog posts
+        uses: actions/download-artifact@v4
         with:
+          name: blog-posts
           path: ./src/posts
-          key: blog-posts-${{ github.sha }}
         
-      # Dodaj krok do debugowania zawartości katalogu posts
-      - name: Debug - List restored posts
+      - name: Debug - List posts
         run: |
-          echo "Listing posts in ./src/posts after cache restore:"
-          ls -la ./src/posts/
-        
-      # Dodaj ten krok, żeby nadpisać pliki z repozytorium tymi z cache
-      - name: Ensure only cached posts are used
-        run: |
-          # Tworzymy tymczasowy katalog
-          mkdir -p ./temp_posts
-                  
-          # Przenosimy wszystkie pliki z cache do tymczasowego katalogu
-          mv ./src/posts/* ./temp_posts/ 2>/dev/null || true
-                  
-          # Czyścimy katalog docelowy
-          rm -rf ./src/posts/*
-                  
-          # Kopiujemy pliki z powrotem
-          cp -r ./temp_posts/* ./src/posts/ 2>/dev/null || true
-                  
-          # Usuwamy tymczasowy katalog
-          rm -rf ./temp_posts
-                  
           echo "Final posts list:"
           ls -la ./src/posts/
         
