@@ -37,6 +37,9 @@ jobs:
 
       - name: Build Blog with Vite
         run: bun run build
+        env:
+          VITE_BLOG_AUTHOR: ${{ vars.VITE_BLOG_AUTHOR }}
+          VITE_BLOG_TITLE: ${{ vars.VITE_BLOG_TITLE }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
